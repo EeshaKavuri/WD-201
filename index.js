@@ -1,10 +1,13 @@
 const http = require("http");
 const fs = require("fs");
-
+let args = require("minimist")(process.argv.slice(2));
+let port = args.port;
+let portstr = String(port);
 
 
 let homeContent = "";
 let projectContent = "";
+let registerContent = "";
 
 fs.readFile("home.html", (err, home) => {
     if (err) {
@@ -20,36 +23,29 @@ fs.readFile("project.html", (err, project) => {
     projectContent = project;
 });
 
-http.createServer((request, response) => {
-    let url = request.url;
-    response.writeHeader(200, { "Content-Type": "text/html" });
-    switch (url) {
-        case "/project":
-            response.write(projectContent);
-            response.end();
-            break;
-        default:
-            response.write(homeContent);
-            response.end();
-            break;
-    }
-}).listen(3000);
-
-/*
-fs.readFile("home.html", (err, home) => {
-    console.log(home.toString());
-});
-
-fs.readFile("home.html", (err, home) => {
+fs.readFile("registration.html", (err, register) => {
     if (err) {
         throw err;
     }
-    http
-        .createServer((request, response) => {
-            response.writeHeader(200, { "Content-Type": "text/html" });
-            response.write(home);
-            response.end();
-        })
-        .listen(3000);
+    registerContent = register;
 });
-*/
+http
+    .createServer((request, response) => {
+        let url = request.url;
+        response.writeHeader(200, { "Content-Type": "text/html" });
+        switch (url) {
+            case "/project":
+                response.write(projectContent);
+                response.end();
+                break;
+            case "/registration":
+                response.write(registerContent);
+                response.end();
+                break;
+            default:
+                response.write(homeContent);
+                response.end();
+                break;
+        }
+    })
+    .listen(portstr);
